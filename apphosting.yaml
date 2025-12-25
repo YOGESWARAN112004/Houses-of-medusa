@@ -1,0 +1,58 @@
+# Firebase App Hosting configuration
+# https://firebase.google.com/docs/app-hosting/configure
+
+runConfig:
+  # Minimum number of instances to keep running
+  minInstances: 0
+  # Maximum number of instances
+  maxInstances: 100
+  # Memory allocation per instance
+  memory: 512Mi
+  # CPU allocation per instance
+  cpu: 1
+  # Request timeout in seconds
+  timeout: 60
+
+env:
+  # Firebase Configuration (set in Firebase Console > App Hosting > Environment Variables)
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    secret: AIzaSyC_L9MzgS0-DmYZyGQCr27ZTKN-9CMZ-94
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    secret: houses-of-medusa.firebaseapp.com
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    secret: houses-of-medusa
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    secret: houses-of-medusa.firebasestorage.app
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    secret: 15328712454
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    secret: 1:15328712454:web:6dd1fe6eec73ed25b33087
+  
+  # Razorpay Configuration
+  - variable: RAZORPAY_KEY_ID
+    secret: rzp_test_RrRl52jZAuJEqF
+  - variable: RAZORPAY_KEY_SECRET
+    secret: 3RXiiPE2gDXtOQIukYvwz3xm
+  - variable: NEXT_PUBLIC_RAZORPAY_KEY_ID
+    secret: rzp_test_RrRl52jZAuJEqF
+
+  - variable: NEXT_PUBLIC_GA_MEASUREMENT_ID
+    secret: G-18GN7F1JE2
+
+  - variable: FIREBASE_ADMIN_CLIENT_EMAIL
+    secret: firebase-adminsdk-fbsvc@houses-of-medusa.iam.gserviceaccount.com
+
+  - variable: FIREBASE_ADMIN_PRIVATE_KEY
+    secret: "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCgCvxVpHtpfpZU\n+TnC/TwYifH6XpW1dw+mpYdjZR/UpkDtv7k1/3TnV2MIz3VtYlSfrLnI5sBTHd8f\nh75K8tkLhFV8y2ZoMWzULtuHOILk+sDGzO2MmH4f0x2K5YJchWy08P1HMvx1+ipH\noJwNTzjT4exBKHSb2tGQqZSnCdK7fZ/6RS6TYUPK6DDqROZI/BoRPF9FjmC0vozx\nHIWQYn0WIGZTF+mQZg4W7c8TnEkHKWk1KUl9o3dTYNluqyloQ51rCYxW5BMbUCwl\nH1TviQrDx7bSZRE9eJtPTkl1jeSJEb9Nk1AqTRjWtaIaBcX7/OH6Rv6eK+UH3tZJ\nrDAgX/+tAgMBAAECggEAByFA0/FA95aGd1X8Zx3FrfOEo+Uk1vHCm7z8xsZ8NYq2\nknZGd7ZgFz0DEiMT6yyZ8ociZmXepD/3bxMqvMdhjgF2QYSvlO1mw3PW9Ijlo/KG\ni2oZHHi1XbuXsawUiQSqBCGcVwNZe0lgKtK9QQaKKekDD8q6mdrqF9TGOkQrbuN8\nGGgOg9VeigZwNiOdeu2NkmJQ3ZOijs/Q9NBNc4ytPuAZOtjP9aSX1c/QtCNeq8Ja\nkQDZLMfRIg+zn43asH5Kgo6Q55lurK7RsKK7TPAl6XjrkF8IGuAfiFq5aY8IsaLI\nzv8i4Ezaphrp/uXSU09zyW8japynGSLGkbHkN32JTQKBgQDbkpbirDOTImo2zG7P\naBKuAzfplzxj6efYeLWOCqlVEF21ZzSNzevGsLERhW0D2zOsnvjktBdKOcGbToBj\nNX35QAU3TuCBJNx8CyySXtzaGIO+PqGrx4urEBVg4fu1E6WlPNdyKMRiMErw+WWr\ngEmZC0bxLm8ulO8ZRCVDvoJJ+wKBgQC6mCBCgGWgk/KLCECvR4Zx0WkJlFKeYQD8\n1vzR8wV0/Mlu7nTWrZcdA4nxQx+BGusZQ3+c2SBV+GBJNaLnx2w0xIpExDxsC4ow\ndL/DrOzTB4zUuCDDquxn49X+yx8vFBVYme48k2acJQmes5/ZneLjJUgNSHMsbZHb\njUaStZgUdwKBgAzU9khs896nZjmpnNg2JtFQktXt5rOYGdqGw2V3rgmwmSlezK10\n2VCVRuPVPle5Wb2+1KDY/XtzAKOI5OvnVmNYoHVpAKnLc680H/i13oZIZHqbwmr9\nkGYA3J761fDxIv8THSwowcFTPS30BUMOjj6JcC3sHsdEIO0DFIJvAcI9AoGAemWB\ne73Xa/7AMXznWVKUmSJhQRxfGW7OBAxN6LX91WBgDXkzgQJ7Rlfk6zI5fymWH4tM\nMSmn8VysZDlfs6P3kaF+hV8nt0PWkLR0ebl7221vbrWdIFyFGBy2aZz5xpro6aaH\nRIr32uLcrZJr/4Z2psL0wWnNys3QyHCiY2fk6z8CgYEArIqpCQV/TRXNZCm4qNp3\nNTpwWhifN6XHH2v1+EBnHkUve4d4cOIM/p/meYSfeyo+7es4DzkjZhhKkzq/f+S5\nQiaiNfSJRCHOLavfmIeBLt8/APGtb3r2o0Df1QXFqILW6yddUP+D76qM1n1PD6i4\nsQ4+ch+Lbakc7E1YanLV9gg=\n-----END PRIVATE KEY-----\n"
+
+  - variable: SMTP_HOST
+    secret: "smtp.gmail.com"
+
+  - variable: SMTP_PORT
+    secret: "587"
+
+  - variable: SMTP_USER
+    secret: "housesofmedusa@gmail.com"
+
+  - variable: SMTP_PASS
+    secret: "tsu jwxx mtcb hoha"
