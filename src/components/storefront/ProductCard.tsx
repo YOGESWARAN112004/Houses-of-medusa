@@ -13,9 +13,9 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, brand, priority = false }: ProductCardProps) {
     const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('en-US', {
+        return new Intl.NumberFormat('en-IN', {
             style: 'currency',
-            currency: 'USD',
+            currency: 'INR',
             minimumFractionDigits: 0,
         }).format(price);
     };
