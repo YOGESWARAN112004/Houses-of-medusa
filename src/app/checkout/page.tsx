@@ -80,18 +80,27 @@ export default function CheckoutPage() {
         setPaymentError(null);
 
         try {
-            // Create order on backend
+            // 1. Create order on backend (Firestore + Razorpay)
+            // We need to send full details to create the pending order
             const response = await fetch('/api/payment/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: total,
-                    currency: 'INR',
-                    receipt: `order_${Date.now()}`,
-                    notes: {
-                        customerEmail: formData.email,
-                        customerName: `${formData.firstName} ${formData.lastName}`,
+                    items: cartItems,
+                    shippingAddress: {
+                        firstName: formData.firstName,
+                        lastName: formData.lastName,
+                        address: formData.address,
+                        apartment: formData.apartment,
+                        city: formData.city,
+                        state: formData.state,
+                        postalCode: formData.postalCode,
+                        country: formData.country,
+                        phone: formData.phone
                     },
+                    customerEmail: formData.email,
+                    customerName: `${formData.firstName} ${formData.lastName}`,
+                    customerPhone: formData.phone
                 }),
             });
 
@@ -101,33 +110,36 @@ export default function CheckoutPage() {
                 throw new Error(data.error || 'Failed to create order');
             }
 
+            // data.data contains: orderId (Firestore), razorpayOrderId, amount, currency
+            const { orderId: firestoreOrderId, razorpayOrderId, amount, currency } = data.data;
+
             // Check if running in demo mode (no Razorpay configured)
             if (data.demo) {
                 // Demo mode - simulate successful payment
                 localStorage.removeItem('medusa-cart');
-                window.location.href = '/checkout/success?order_id=' + data.data.orderId + '&demo=true';
+                window.location.href = '/checkout/success?order_id=' + firestoreOrderId + '&demo=true';
                 return;
             }
 
             // Check if Razorpay key is configured
             const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
             if (!razorpayKey) {
-                // Fallback demo mode
+                // Fallback demo mode if public key missing but backend didn't flag demo
                 localStorage.removeItem('medusa-cart');
-                window.location.href = '/checkout/success?order_id=' + data.data.orderId + '&demo=true';
+                window.location.href = '/checkout/success?order_id=' + firestoreOrderId + '&demo=true';
                 return;
             }
 
-            // Initialize Razorpay checkout
+            // 2. Initialize Razorpay checkout
             const options = {
                 key: razorpayKey,
-                amount: data.data.amount,
-                currency: data.data.currency,
+                amount: amount,
+                currency: currency,
                 name: 'Houses of Medusa',
                 description: 'Luxury Purchase',
-                order_id: data.data.orderId,
+                order_id: razorpayOrderId,
                 handler: async function (response: any) {
-                    // Verify payment on backend
+                    // 3. Verify payment on backend
                     const verifyResponse = await fetch('/api/payment/verify', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -135,6 +147,7 @@ export default function CheckoutPage() {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature,
+                            firestore_order_id: firestoreOrderId // Important for updating status
                         }),
                     });
 
@@ -143,13 +156,13 @@ export default function CheckoutPage() {
                     if (verifyData.success) {
                         // Attribute order to affiliate if applicable
                         await attributeOrderToAffiliate(
-                            response.razorpay_order_id,
+                            firestoreOrderId, // Use system ID
                             `HOM-${Date.now()}`,
                             total
                         );
                         // Clear cart and redirect
                         localStorage.removeItem('medusa-cart');
-                        window.location.href = '/checkout/success?order_id=' + response.razorpay_order_id;
+                        window.location.href = '/checkout/success?order_id=' + firestoreOrderId;
                     } else {
                         setPaymentError('Payment verification failed. Please contact support.');
                     }
@@ -161,6 +174,7 @@ export default function CheckoutPage() {
                 },
                 notes: {
                     address: `${formData.address}, ${formData.city}, ${formData.state} ${formData.postalCode}`,
+                    firestore_order_id: firestoreOrderId
                 },
                 theme: {
                     color: '#c9a86c',
@@ -181,9 +195,9 @@ export default function CheckoutPage() {
                 setIsProcessing(false);
             });
 
-        } catch (error) {
+        } catch (error: any) {
             console.error('Payment error:', error);
-            setPaymentError('Failed to initialize payment. Please try again.');
+            setPaymentError(error.message || 'Failed to initialize payment. Please try again.');
             setIsProcessing(false);
         }
     };

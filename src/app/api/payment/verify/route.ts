@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPaymentSignature } from '@/lib/razorpay';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc, serverTimestamp, increment } from 'firebase/firestore';
 
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature, firestore_order_id } = body;
+
+        // Note: active_order_id (Razorpay order ID) is used for signature
+        // firestore_order_id is the document ID in our DB
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return NextResponse.json(
@@ -21,30 +26,78 @@ export async function POST(request: NextRequest) {
         );
 
         if (!isValid) {
+            console.error('Invalid signature for order:', razorpay_order_id);
             return NextResponse.json(
                 { success: false, error: 'Invalid payment signature' },
                 { status: 400 }
             );
         }
 
-        // Payment is verified - you can now:
-        // 1. Update order status in Firestore
-        // 2. Send confirmation email
-        // 3. Update inventory
-        // 4. etc.
+        // Fetch the order from Firestore to get items for inventory update
+        // We expect firestore_order_id to be passed, but we can also search by Razorpay ID if needed
+        // For simplicity, let's assume we pass firestore_order_id from frontend
 
-        return NextResponse.json({
-            success: true,
-            message: 'Payment verified successfully',
-            data: {
-                orderId: razorpay_order_id,
+        let orderRef;
+        let orderData;
+
+        if (firestore_order_id) {
+            orderRef = doc(db, 'orders', firestore_order_id);
+            const orderSnap = await getDoc(orderRef);
+            if (orderSnap.exists()) {
+                orderData = orderSnap.data();
+            }
+        }
+
+        // If we found the order, proceed with updates
+        if (orderRef && orderData) {
+
+            // 1. Update Order Status
+            await updateDoc(orderRef, {
+                status: 'processing', // Paid confirmed -> Processing
+                paymentStatus: 'paid',
                 paymentId: razorpay_payment_id,
-            },
-        });
-    } catch (error) {
+                razorpayOrderId: razorpay_order_id,
+                updatedAt: serverTimestamp(),
+            });
+
+            // 2. Decrement Inventory
+            const items = orderData.items || [];
+            for (const item of items) {
+                if (item.productId) {
+                    const productRef = doc(db, 'products', item.productId);
+                    await updateDoc(productRef, {
+                        inventory: increment(-item.quantity)
+                    });
+                }
+            }
+
+            return NextResponse.json({
+                success: true,
+                message: 'Payment verified and order updated',
+                data: {
+                    orderId: firestore_order_id,
+                    paymentId: razorpay_payment_id,
+                },
+            });
+
+        } else {
+            // If we couldn't find the Fireatore order (edge case), we still verify the payment
+            // but log an error that the DB update failed
+            console.error('Payment verified but Order not found in Firestore:', firestore_order_id);
+
+            return NextResponse.json({
+                success: true,
+                warning: 'Payment verified but order record not updated',
+                data: {
+                    paymentId: razorpay_payment_id,
+                },
+            });
+        }
+
+    } catch (error: any) {
         console.error('Error verifying payment:', error);
         return NextResponse.json(
-            { success: false, error: 'Failed to verify payment' },
+            { success: false, error: error.message || 'Failed to verify payment' },
             { status: 500 }
         );
     }
