@@ -1,83 +1,262 @@
+/* Checkout Success - Ultra Luxury Celebration */
+
 .main {
-    padding-top: 120px;
+    padding-top: 80px;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
+    background: linear-gradient(135deg, #0a0f1a 0%, #0d1421 50%, #0f1825 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated background particles */
+.main::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        radial-gradient(ellipse at 30% 30%, rgba(201, 168, 108, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 70%, rgba(201, 168, 108, 0.05) 0%, transparent 40%);
+    pointer-events: none;
+    animation: ambientPulse 8s ease-in-out infinite;
+}
+
+@keyframes ambientPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
 }
 
 .container {
-    max-width: 600px;
+    max-width: 560px;
     text-align: center;
-    padding: var(--space-12) var(--space-6);
+    padding: 3rem 1.5rem;
+    position: relative;
+    z-index: 1;
 }
 
+/* Success Icon - Animated Celebration */
 .successIcon {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background: rgba(34, 197, 94, 0.1);
-    border: 2px solid rgba(34, 197, 94, 0.3);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 2px solid rgba(16, 185, 129, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto var(--space-8);
-    color: #22c55e;
+    margin: 0 auto 2rem;
+    color: #10b981;
+    animation: successPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    box-shadow:
+        0 0 40px rgba(16, 185, 129, 0.2),
+        inset 0 0 20px rgba(16, 185, 129, 0.1);
 }
 
+@keyframes successPop {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.successIcon svg {
+    animation: checkDraw 0.8s ease forwards 0.3s;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+}
+
+@keyframes checkDraw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* Title */
 .container h1 {
-    font-family: var(--font-display);
-    font-size: var(--text-4xl);
-    color: var(--ivory);
-    margin-bottom: var(--space-4);
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(1.75rem, 5vw, 2.5rem);
+    font-weight: 400;
+    color: #ffffff;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, #ffffff 0%, #c9a86c 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: fadeInUp 0.8s ease forwards 0.2s;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .subtitle {
-    font-size: var(--text-lg);
-    color: var(--text-muted);
-    margin-bottom: var(--space-8);
-    line-height: 1.6;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.55);
+    margin-bottom: 2.5rem;
+    line-height: 1.7;
+    animation: fadeInUp 0.8s ease forwards 0.4s;
+    opacity: 0;
 }
 
+/* Order Info Card */
 .orderInfo {
-    padding: var(--space-6);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border-subtle);
-    margin-bottom: var(--space-8);
+    padding: 1.75rem 2rem;
+    background: linear-gradient(135deg, rgba(26, 39, 68, 0.6) 0%, rgba(26, 39, 68, 0.3) 100%);
+    border: 1px solid rgba(201, 168, 108, 0.15);
+    border-radius: 16px;
+    margin-bottom: 2.5rem;
+    backdrop-filter: blur(10px);
+    animation: fadeInUp 0.8s ease forwards 0.5s;
+    opacity: 0;
 }
 
 .orderInfo p {
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    margin-bottom: var(--space-2);
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.65);
+    margin-bottom: 0.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.orderInfo p::before {
+    content: '✓';
+    color: #10b981;
+    font-size: 0.75rem;
 }
 
 .orderInfo p:last-child {
     margin-bottom: 0;
 }
 
+/* Action Buttons */
 .actions {
     display: flex;
-    gap: var(--space-4);
+    gap: 1rem;
     justify-content: center;
-    margin-bottom: var(--space-12);
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease forwards 0.6s;
+    opacity: 0;
+}
+
+.actions .btn {
+    padding: 1rem 2rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+}
+
+.actions .btn-primary {
+    background: linear-gradient(135deg, #c9a86c 0%, #a07c4a 100%);
+    color: #0d1421;
+    box-shadow: 0 8px 24px rgba(201, 168, 108, 0.3);
+}
+
+.actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(201, 168, 108, 0.4);
+}
+
+.actions .btn-secondary {
+    background: transparent;
+    color: #c9a86c;
+    border: 1px solid rgba(201, 168, 108, 0.4);
+}
+
+.actions .btn-secondary:hover {
+    background: rgba(201, 168, 108, 0.1);
+    border-color: #c9a86c;
+}
+
+/* Support */
+.support {
+    animation: fadeInUp 0.8s ease forwards 0.7s;
+    opacity: 0;
 }
 
 .support p {
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    margin-bottom: var(--space-2);
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 0.5rem;
 }
 
 .support a {
-    font-size: var(--text-sm);
-    color: var(--gold-primary);
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    font-size: 0.85rem;
+    color: #c9a86c;
+    text-decoration: none;
+    border-bottom: 1px dotted rgba(201, 168, 108, 0.4);
+    padding-bottom: 2px;
+    transition: all 0.3s ease;
 }
 
-@media (max-width: 640px) {
+.support a:hover {
+    border-color: #c9a86c;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main {
+        padding-top: 70px;
+    }
+
+    .container {
+        padding: 2rem 1.25rem;
+    }
+
+    .successIcon {
+        width: 80px;
+        height: 80px;
+        margin-bottom: 1.5rem;
+    }
+
+    .successIcon svg {
+        width: 50px;
+        height: 50px;
+    }
+
+    .orderInfo {
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+    }
+
+    .orderInfo p {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
     .actions {
         flex-direction: column;
+    }
+
+    .actions .btn {
+        width: 100%;
     }
 }

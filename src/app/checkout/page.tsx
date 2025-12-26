@@ -113,22 +113,12 @@ export default function CheckoutPage() {
             // data.data contains: orderId (Firestore), razorpayOrderId, amount, currency
             const { orderId: firestoreOrderId, razorpayOrderId, amount, currency } = data.data;
 
-            // Check if running in demo mode (no Razorpay configured)
-            if (data.demo) {
-                // Demo mode - simulate successful payment
-                localStorage.removeItem('medusa-cart');
-                window.location.href = '/checkout/success?order_id=' + firestoreOrderId + '&demo=true';
-                return;
-            }
-
             // Check if Razorpay key is configured
             const razorpayKey = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
             if (!razorpayKey) {
-                // Fallback demo mode if public key missing but backend didn't flag demo
-                localStorage.removeItem('medusa-cart');
-                window.location.href = '/checkout/success?order_id=' + firestoreOrderId + '&demo=true';
-                return;
+                throw new Error('Payment gateway not configured. Please contact support.');
             }
+
 
             // 2. Initialize Razorpay checkout
             const options = {

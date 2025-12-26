@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyPaymentSignature } from '@/lib/razorpay';
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { sendOrderEmails } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
     try {
@@ -73,6 +74,30 @@ export async function POST(request: NextRequest) {
                 }
             }
             await batch.commit();
+
+            // 3. Send Email Notifications (customer + admins)
+            try {
+                const emailResult = await sendOrderEmails({
+                    orderId: firestore_order_id,
+                    customerName: orderData.customerName,
+                    customerEmail: orderData.customerEmail,
+                    customerPhone: orderData.customerPhone,
+                    items: items.map((item: any) => ({
+                        name: item.name,
+                        quantity: item.quantity,
+                        price: item.price,
+                        size: item.variantId || item.size,
+                        image: item.image,
+                    })),
+                    pricing: orderData.pricing,
+                    shippingAddress: orderData.shippingAddress,
+                    paymentId: razorpay_payment_id,
+                });
+                console.log('Email notifications sent:', emailResult);
+            } catch (emailError) {
+                // Don't fail the order if email fails
+                console.error('Email notification error (non-blocking):', emailError);
+            }
 
             return NextResponse.json({
                 success: true,

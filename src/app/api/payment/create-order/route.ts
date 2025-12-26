@@ -94,21 +94,15 @@ export async function POST(request: NextRequest) {
         const keyId = process.env.RAZORPAY_KEY_ID;
         const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-        // Demo Mode Check
+        // Require Razorpay configuration - no demo mode
         if (!keyId || !keySecret) {
-            console.log('Razorpay not configured - running in demo mode');
-            // Update order with demo ID
-            return NextResponse.json({
-                success: true,
-                demo: true,
-                data: {
-                    orderId: firestoreOrderId, // Use Firestore ID as ref
-                    razorpayOrderId: `demo_rp_${Date.now()}`,
-                    amount: total,
-                    currency: 'INR',
-                },
-            });
+            console.error('Razorpay credentials not configured');
+            return NextResponse.json(
+                { success: false, error: 'Payment gateway not configured. Please contact support.' },
+                { status: 500 }
+            );
         }
+
 
         const Razorpay = (await import('razorpay')).default;
         const razorpay = new Razorpay({
