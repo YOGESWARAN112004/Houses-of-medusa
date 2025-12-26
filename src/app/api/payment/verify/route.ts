@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyPaymentSignature } from '@/lib/razorpay';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc, serverTimestamp, increment } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(request: NextRequest) {
     try {
@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
         let orderData;
 
         if (firestore_order_id) {
-            orderRef = doc(db, 'orders', firestore_order_id);
-            const orderSnap = await getDoc(orderRef);
-            if (orderSnap.exists()) {
+            orderRef = adminDb.collection('orders').doc(firestore_order_id);
+            const orderSnap = await orderRef.get();
+            if (orderSnap.exists) {
                 orderData = orderSnap.data();
             }
         }
@@ -52,24 +52,27 @@ export async function POST(request: NextRequest) {
         if (orderRef && orderData) {
 
             // 1. Update Order Status
-            await updateDoc(orderRef, {
+            await orderRef.update({
                 status: 'processing', // Paid confirmed -> Processing
                 paymentStatus: 'paid',
                 paymentId: razorpay_payment_id,
                 razorpayOrderId: razorpay_order_id,
-                updatedAt: serverTimestamp(),
+                updatedAt: FieldValue.serverTimestamp(),
             });
 
             // 2. Decrement Inventory
             const items = orderData.items || [];
+            const batch = adminDb.batch();
+
             for (const item of items) {
                 if (item.productId) {
-                    const productRef = doc(db, 'products', item.productId);
-                    await updateDoc(productRef, {
-                        inventory: increment(-item.quantity)
+                    const productRef = adminDb.collection('products').doc(item.productId);
+                    batch.update(productRef, {
+                        inventory: FieldValue.increment(-item.quantity)
                     });
                 }
             }
+            await batch.commit();
 
             return NextResponse.json({
                 success: true,

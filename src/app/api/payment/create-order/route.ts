@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, doc, getDoc } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export async function POST(request: NextRequest) {
     try {
@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
 
         for (const item of items) {
             // Fetch product to verify price and stock
-            const productRef = doc(db, 'products', item.productId);
-            const productSnap = await getDoc(productRef);
+            const productRef = adminDb.collection('products').doc(item.productId);
+            const productSnap = await productRef.get();
 
-            if (!productSnap.exists()) {
+            if (!productSnap.exists) {
                 return NextResponse.json(
                     { success: false, error: `Product not found: ${item.productName}` },
                     { status: 400 }
@@ -31,6 +31,13 @@ export async function POST(request: NextRequest) {
             }
 
             const productData = productSnap.data();
+
+            if (!productData) {
+                return NextResponse.json(
+                    { success: false, error: `Product data invalid: ${item.productName}` },
+                    { status: 400 }
+                );
+            }
 
             // Check inventory
             if (productData.inventory < item.quantity) {
@@ -76,11 +83,11 @@ export async function POST(request: NextRequest) {
             },
             shippingAddress,
             billingAddress: shippingAddress, // Default to same for now
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(),
+            updatedAt: FieldValue.serverTimestamp(),
         };
 
-        const orderRef = await addDoc(collection(db, 'orders'), orderData);
+        const orderRef = await adminDb.collection('orders').add(orderData);
         const firestoreOrderId = orderRef.id;
 
         // 3. Initialize Razorpay Order
@@ -91,7 +98,6 @@ export async function POST(request: NextRequest) {
         if (!keyId || !keySecret) {
             console.log('Razorpay not configured - running in demo mode');
             // Update order with demo ID
-            // In a real app we might not want to save demo orders or handle them differently
             return NextResponse.json({
                 success: true,
                 demo: true,
