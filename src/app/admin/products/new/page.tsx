@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, collection, getDocs } from 'firebase/firestore';
 import { storage, db } from '@/lib/firebase';
 import styles from './page.module.css';
 
@@ -19,12 +19,19 @@ interface UploadProgress {
     progress: number;
 }
 
+interface Brand {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 export default function NewProductPage() {
     const router = useRouter();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [images, setImages] = useState<UploadedImage[]>([]);
     const [uploading, setUploading] = useState<UploadProgress[]>([]);
     const [isSaving, setIsSaving] = useState(false);
+    const [brands, setBrands] = useState<Brand[]>([]);
     const [formData, setFormData] = useState({
         name: '',
         slug: '',
@@ -37,6 +44,20 @@ export default function NewProductPage() {
         visibility: 'draft',
         featured: false,
     });
+
+    useEffect(() => {
+        fetchBrands();
+    }, []);
+
+    const fetchBrands = async () => {
+        try {
+            const snapshot = await getDocs(collection(db, 'brands'));
+            const brandsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Brand[];
+            setBrands(brandsData);
+        } catch (error) {
+            console.error('Error fetching brands:', error);
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -233,12 +254,11 @@ export default function NewProductPage() {
                                         required
                                     >
                                         <option value="">Select Brand</option>
-                                        <option value="versace">Versace</option>
-                                        <option value="armani">Giorgio Armani</option>
-                                        <option value="prada">Prada</option>
-                                        <option value="gucci">Gucci</option>
-                                        <option value="dolce-gabbana">Dolce & Gabbana</option>
-                                        <option value="burberry">Burberry</option>
+                                        {brands.map(brand => (
+                                            <option key={brand.id} value={brand.id}>
+                                                {brand.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
 

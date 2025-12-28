@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { use } from 'react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import styles from '../new/page.module.css';
 
 // Demo product data
@@ -21,6 +23,12 @@ const getProduct = (id: string) => ({
     featured: true,
 });
 
+interface Brand {
+    id: string;
+    name: string;
+    slug: string;
+}
+
 interface PageProps {
     params: Promise<{ id: string }>;
 }
@@ -29,6 +37,7 @@ export default function EditProductPage({ params }: PageProps) {
     const { id } = use(params);
     const router = useRouter();
     const product = getProduct(id);
+    const [brands, setBrands] = useState<Brand[]>([]);
 
     const [formData, setFormData] = useState({
         name: product.name,
@@ -42,6 +51,20 @@ export default function EditProductPage({ params }: PageProps) {
         visibility: product.visibility,
         featured: product.featured,
     });
+
+    useEffect(() => {
+        fetchBrands();
+    }, []);
+
+    const fetchBrands = async () => {
+        try {
+            const snapshot = await getDocs(collection(db, 'brands'));
+            const brandsData = snapshot.docs.map(d => ({ id: d.id, ...d.data() })) as Brand[];
+            setBrands(brandsData);
+        } catch (error) {
+            console.error('Error fetching brands:', error);
+        }
+    };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -105,10 +128,11 @@ export default function EditProductPage({ params }: PageProps) {
                                     <label htmlFor="brand">Brand *</label>
                                     <select id="brand" name="brand" value={formData.brand} onChange={handleInputChange} required>
                                         <option value="">Select Brand</option>
-                                        <option value="versace">Versace</option>
-                                        <option value="armani">Armani</option>
-                                        <option value="prada">Prada</option>
-                                        <option value="gucci">Gucci</option>
+                                        {brands.map(brand => (
+                                            <option key={brand.id} value={brand.id}>
+                                                {brand.name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
                                 <div className={styles.formGroup}>
