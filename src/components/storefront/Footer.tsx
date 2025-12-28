@@ -1,20 +1,15 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import styles from './Footer.module.css';
 
 export default function Footer() {
     return (
         <footer className={styles.footer}>
+            <div className={styles.footerGlow}></div>
             <div className={styles.container}>
                 {/* Top Section */}
                 <div className={styles.top}>
                     <div className={styles.brand}>
-                        <Image
-                            src="/logo.png"
-                            alt="Houses of Medusa"
-                            width={100}
-                            height={80}
-                        />
+                        <h2 className={styles.brandName}>Houses of Medusa</h2>
                         <p className={styles.tagline}>
                             "We don't sell fashion.<br />We sell status."
                         </p>
@@ -70,14 +65,14 @@ export default function Footer() {
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
                                 <path d="M9 12l2 2 4-4" />
                             </svg>
-                            Verified Authenticity
+                            <span>Verified Authenticity</span>
                         </span>
                         <span className={styles.trustBadge}>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                                 <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
                                 <line x1="1" y1="10" x2="23" y2="10" />
                             </svg>
-                            Secure Payment
+                            <span>Secure Payment</span>
                         </span>
                     </div>
                 </div>

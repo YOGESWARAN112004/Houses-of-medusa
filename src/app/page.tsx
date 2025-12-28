@@ -101,55 +101,63 @@ export default function HomePage() {
       <Header transparent />
 
       <main>
-        {/* Hero Section */}
+        {/* Hero Section - Transcendent */}
         <section className={styles.hero}>
+          {/* Animated Background */}
           <div className={styles.heroBackground}>
-            <div className={styles.heroGradient}></div>
+            <div className={styles.auroraGradient}></div>
+            <div className={styles.heroGlow}></div>
             <div className={styles.heroPattern}></div>
+            <div className={styles.floatingOrbs}>
+              <span className={styles.orb}></span>
+              <span className={styles.orb}></span>
+              <span className={styles.orb}></span>
+            </div>
           </div>
 
+          {/* Hero Content */}
           <div className={styles.heroContent}>
-            <div className={styles.heroLogo}>
-              <Image
-                src="/logo.png"
-                alt="Houses of Medusa"
-                width={375}
-                height={300}
-                priority
-              />
-            </div>
+            <p className={styles.heroEyebrow}>Luxury Outlet Retail</p>
             <h1 className={styles.heroTitle}>
-              Houses of Medusa
+              <span className={styles.heroTitleLine}>Houses of</span>
+              <span className={styles.heroTitleLine}>Medusa</span>
             </h1>
-            <p className={styles.heroSubtitle}>
-              Luxury Outlet Retail
-            </p>
-            <div className={styles.heroDivider}></div>
+            <div className={styles.heroDivider}>
+              <span></span>
+            </div>
             <p className={styles.heroTagline}>
               {homepage?.hero?.title || "We don't sell fashion. We sell status."}
             </p>
             <div className={styles.heroActions}>
-              <Link href={homepage?.hero?.ctaPrimary?.link || "/products"} className="btn btn-primary">
-                {homepage?.hero?.ctaPrimary?.text || "Explore Collection"}
+              <Link href={homepage?.hero?.ctaPrimary?.link || "/products"} className={styles.btnPrimary}>
+                <span>{homepage?.hero?.ctaPrimary?.text || "Explore Collection"}</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
               </Link>
-              <Link href={homepage?.hero?.ctaSecondary?.link || "/about"} className="btn btn-secondary">
+              <Link href={homepage?.hero?.ctaSecondary?.link || "/about"} className={styles.btnSecondary}>
                 {homepage?.hero?.ctaSecondary?.text || "Our Story"}
               </Link>
             </div>
           </div>
 
+          {/* Scroll Indicator */}
           <div className={styles.scrollIndicator}>
             <span>Discover</span>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 5v14M19 12l-7 7-7-7" />
-            </svg>
+            <div className={styles.scrollLine}>
+              <span></span>
+            </div>
           </div>
         </section>
 
         {/* Announcement Strip */}
         {homepage?.announcement?.enabled !== false && homepage?.announcement?.text && (
           <div className={styles.announcement}>
-            <p>{homepage.announcement.text}</p>
+            <div className={styles.announcementInner}>
+              <span className={styles.announcementIcon}>✦</span>
+              <p>{homepage.announcement.text}</p>
+              <span className={styles.announcementIcon}>✦</span>
+            </div>
           </div>
         )}
 
@@ -170,6 +178,7 @@ export default function HomePage() {
                   key={coll.id}
                   href={`/collections/${coll.slug}`}
                   className={styles.collectionCard}
+                  style={{ '--delay': `${index * 0.1}s` } as React.CSSProperties}
                 >
                   <div className={styles.collectionImage}>
                     {coll.image ? (
@@ -180,6 +189,7 @@ export default function HomePage() {
                       </div>
                     )}
                     <div className={styles.collectionOverlay}></div>
+                    <div className={styles.collectionShine}></div>
                   </div>
                   <div className={styles.collectionContent}>
                     <span className={styles.collectionIndex}>0{index + 1}</span>
@@ -200,6 +210,9 @@ export default function HomePage() {
 
         {/* Editorial Banner */}
         <section className={styles.editorial}>
+          <div className={styles.editorialBackground}>
+            <div className={styles.editorialGradient}></div>
+          </div>
           <div className={styles.editorialContent}>
             <span className={styles.editorialEyebrow}>The Medusa Philosophy</span>
             <h2 className={styles.editorialTitle}>
@@ -209,12 +222,9 @@ export default function HomePage() {
               Every piece in our collection is sourced directly from verified factory outlets,
               ensuring authenticity while providing access to luxury that was once reserved for the few.
             </p>
-            <Link href="/about" className="btn btn-secondary">
+            <Link href="/about" className={styles.btnSecondary}>
               Learn More
             </Link>
-          </div>
-          <div className={styles.editorialImage}>
-            <div className={styles.editorialPattern}></div>
           </div>
         </section>
 
@@ -230,11 +240,12 @@ export default function HomePage() {
             </div>
 
             <div className={styles.productsGrid}>
-              {products.map((product) => (
+              {products.map((product, index) => (
                 <Link
                   key={product.id}
                   href={`/products/${product.slug}`}
                   className={styles.productCard}
+                  style={{ '--delay': `${index * 0.1}s` } as React.CSSProperties}
                 >
                   <div className={styles.productImage}>
                     {product.images?.[0] ? (
@@ -274,7 +285,7 @@ export default function HomePage() {
             </div>
 
             <div className={styles.sectionAction}>
-              <Link href="/products" className="btn btn-secondary">
+              <Link href="/products" className={styles.btnSecondary}>
                 View All Pieces
               </Link>
             </div>
@@ -346,17 +357,23 @@ export default function HomePage() {
 
         {/* Newsletter */}
         <section className={styles.newsletter}>
+          <div className={styles.newsletterBackground}>
+            <div className={styles.newsletterGlow}></div>
+          </div>
           <div className={styles.newsletterContent}>
+            <span className={styles.newsletterEyebrow}>Exclusive Access</span>
             <h2>Join the House</h2>
             <p>Receive exclusive access to new arrivals, private sales, and curated collections.</p>
             <form className={styles.newsletterForm}>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className={styles.newsletterInput}
-              />
-              <button type="submit" className="btn btn-primary">
-                Subscribe
+              <div className={styles.inputWrapper}>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className={styles.newsletterInput}
+                />
+              </div>
+              <button type="submit" className={styles.btnPrimary}>
+                <span>Subscribe</span>
               </button>
             </form>
             <span className={styles.newsletterNote}>
