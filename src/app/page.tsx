@@ -105,6 +105,16 @@ export default function HomePage() {
         <section className={styles.hero}>
           {/* Animated Background */}
           <div className={styles.heroBackground}>
+            <div className={styles.heroBackgroundImage}>
+              <Image
+                src="/image.png"
+                alt="Houses of Medusa"
+                fill
+                style={{ objectFit: 'cover' }}
+                priority
+              />
+              <div className={styles.heroImageOverlay}></div>
+            </div>
             <div className={styles.auroraGradient}></div>
             <div className={styles.heroGlow}></div>
             <div className={styles.heroPattern}></div>
