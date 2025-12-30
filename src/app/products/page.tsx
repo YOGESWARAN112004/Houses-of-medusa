@@ -28,7 +28,9 @@ interface Category {
     name: string;
 }
 
-export default function ProductsPage() {
+import { Suspense } from 'react';
+
+function ProductsContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
@@ -82,114 +84,120 @@ export default function ProductsPage() {
         });
 
     return (
-        <>
-            <Header />
+        <main className={styles.main}>
+            {/* Page Header */}
+            <section className={styles.pageHeader}>
+                <span className={styles.eyebrow}>Private Access</span>
+                <h1>The Collection</h1>
+                <p>Curated luxury pieces with exclusive private pricing</p>
+            </section>
 
-            <main className={styles.main}>
-                {/* Page Header */}
-                <section className={styles.pageHeader}>
-                    <span className={styles.eyebrow}>Private Access</span>
-                    <h1>The Collection</h1>
-                    <p>Curated luxury pieces with exclusive private pricing</p>
-                </section>
-
-                {/* Filters */}
-                <div className={styles.filters}>
-                    <div className={styles.filterGroup}>
-                        <span className={styles.filterLabel}>Category</span>
-                        <div className={styles.filterOptions}>
-                            <button
-                                className={`${styles.filterBtn} ${selectedCategory === 'all' ? styles.active : ''}`}
-                                onClick={() => setSelectedCategory('all')}
-                            >
-                                All
-                            </button>
-                            {categories.map((cat) => (
-                                <button
-                                    key={cat.id}
-                                    className={`${styles.filterBtn} ${selectedCategory === cat.id ? styles.active : ''}`}
-                                    onClick={() => setSelectedCategory(cat.id)}
-                                >
-                                    {cat.name}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                    <div className={styles.filterGroup}>
-                        <span className={styles.filterLabel}>Sort</span>
-                        <select
-                            className={styles.filterSelect}
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
+            {/* Filters */}
+            <div className={styles.filters}>
+                <div className={styles.filterGroup}>
+                    <span className={styles.filterLabel}>Category</span>
+                    <div className={styles.filterOptions}>
+                        <button
+                            className={`${styles.filterBtn} ${selectedCategory === 'all' ? styles.active : ''}`}
+                            onClick={() => setSelectedCategory('all')}
                         >
-                            <option value="featured">Featured</option>
-                            <option value="newest">Newest</option>
-                            <option value="price-low">Price: Low to High</option>
-                            <option value="price-high">Price: High to Low</option>
-                        </select>
-                    </div>
-                </div>
-
-                {/* Products Grid */}
-                {loading ? (
-                    <div className={styles.loading}>Loading products...</div>
-                ) : filteredProducts.length === 0 ? (
-                    <div className={styles.empty}>
-                        <p>No products available yet.</p>
-                        <p>Check back soon for new arrivals!</p>
-                    </div>
-                ) : (
-                    <div className={styles.productsGrid}>
-                        {filteredProducts.map((product) => (
-                            <Link
-                                key={product.id}
-                                href={`/products/${product.slug}`}
-                                className={styles.productCard}
+                            All
+                        </button>
+                        {categories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                className={`${styles.filterBtn} ${selectedCategory === cat.id ? styles.active : ''}`}
+                                onClick={() => setSelectedCategory(cat.id)}
                             >
-                                <div className={styles.productImage}>
-                                    {product.images?.[0] ? (
-                                        <Image
-                                            src={product.images[0]}
-                                            alt={product.name}
-                                            fill
-                                            style={{ objectFit: 'cover' }}
-                                        />
-                                    ) : (
-                                        <div className={styles.productPlaceholder}>
-                                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                                <circle cx="8.5" cy="8.5" r="1.5" />
-                                                <polyline points="21,15 16,10 5,21" />
-                                            </svg>
-                                        </div>
-                                    )}
-                                    {product.tags && product.tags.length > 0 && (
-                                        <div className={styles.productTags}>
-                                            {product.tags.map((tag, i) => (
-                                                <span key={i} className={styles.productTag}>{tag}</span>
-                                            ))}
-                                        </div>
-                                    )}
-                                    <div className={styles.productOverlay}>
-                                        <span className={styles.productViewBtn}>View Details</span>
-                                    </div>
-                                </div>
-                                <div className={styles.productContent}>
-                                    <span className={styles.productBrand}>{product.brandId}</span>
-                                    <h3 className={styles.productName}>{product.name}</h3>
-                                    <div className={styles.productPrice}>
-                                        <span className={styles.price}>{formatPrice(product.price)}</span>
-                                        {product.compareAtPrice && (
-                                            <span className={styles.comparePrice}>{formatPrice(product.compareAtPrice)}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            </Link>
+                                {cat.name}
+                            </button>
                         ))}
                     </div>
-                )}
-            </main>
+                </div>
+                <div className={styles.filterGroup}>
+                    <span className={styles.filterLabel}>Sort</span>
+                    <select
+                        className={styles.filterSelect}
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value)}
+                    >
+                        <option value="featured">Featured</option>
+                        <option value="newest">Newest</option>
+                        <option value="price-low">Price: Low to High</option>
+                        <option value="price-high">Price: High to Low</option>
+                    </select>
+                </div>
+            </div>
 
+            {/* Products Grid */}
+            {loading ? (
+                <div className={styles.loading}>Loading products...</div>
+            ) : filteredProducts.length === 0 ? (
+                <div className={styles.empty}>
+                    <p>No products available yet.</p>
+                    <p>Check back soon for new arrivals!</p>
+                </div>
+            ) : (
+                <div className={styles.productsGrid}>
+                    {filteredProducts.map((product) => (
+                        <Link
+                            key={product.id}
+                            href={`/products/${product.slug}`}
+                            className={styles.productCard}
+                        >
+                            <div className={styles.productImage}>
+                                {product.images?.[0] ? (
+                                    <Image
+                                        src={product.images[0]}
+                                        alt={product.name}
+                                        fill
+                                        style={{ objectFit: 'cover' }}
+                                    />
+                                ) : (
+                                    <div className={styles.productPlaceholder}>
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                                            <circle cx="8.5" cy="8.5" r="1.5" />
+                                            <polyline points="21,15 16,10 5,21" />
+                                        </svg>
+                                    </div>
+                                )}
+                                {product.tags && product.tags.length > 0 && (
+                                    <div className={styles.productTags}>
+                                        {product.tags.map((tag, i) => (
+                                            <span key={i} className={styles.productTag}>{tag}</span>
+                                        ))}
+                                    </div>
+                                )}
+                                <div className={styles.productOverlay}>
+                                    <span className={styles.productViewBtn}>View Details</span>
+                                </div>
+                            </div>
+                            <div className={styles.productContent}>
+                                <span className={styles.productBrand}>{product.brandId}</span>
+                                <h3 className={styles.productName}>{product.name}</h3>
+                                <div className={styles.productPrice}>
+                                    <span className={styles.price}>{formatPrice(product.price)}</span>
+                                    {product.compareAtPrice && (
+                                        <span className={styles.comparePrice}>{formatPrice(product.compareAtPrice)}</span>
+                                    )}
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
+                </div>
+            )}
+        </main>
+    );
+}
+
+export default function ProductsPage() {
+    return (
+        <>
+            <Header />
+            <Suspense fallback={<div style={{ paddingTop: '100px', textAlign: 'center' }}>Loading...</div>}>
+                <ProductsContent />
+            </Suspense>
             <Footer />
         </>
     );
