@@ -5,6 +5,7 @@ import Header from '@/components/storefront/Header';
 import Footer from '@/components/storefront/Footer';
 import styles from './page.module.css';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { collection, getDocs, query, where, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -31,8 +32,16 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState('all');
+    const searchParams = useSearchParams();
+    const initialCategory = searchParams.get('category');
+    const [selectedCategory, setSelectedCategory] = useState(initialCategory || 'all');
     const [sortBy, setSortBy] = useState('featured');
+
+    useEffect(() => {
+        if (initialCategory) {
+            setSelectedCategory(initialCategory);
+        }
+    }, [initialCategory]);
 
     useEffect(() => {
         fetchData();
